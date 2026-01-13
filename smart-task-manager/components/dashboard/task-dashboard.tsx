@@ -1,4 +1,6 @@
-import { useState, type ReactNode } from 'react';
+'use client';
+
+import { useState, type ReactNode, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -74,6 +76,14 @@ export default function TaskDashboard() {
     const [activeView, setActiveView] = useState<'kanban' | 'calendar' | 'list'>('kanban');
     const [draggedTask, setDraggedTask] = useState<string | null>(null);
     const [classifyingTask, setClassifyingTask] = useState<string | null>(null);
+    const [now, setNow] = useState<number | null>(null);
+
+    useEffect(() => {
+        setNow(Date.now());
+        // Update 'now' every minute to refresh urgency indicators
+        const interval = setInterval(() => setNow(Date.now()), 60000);
+        return () => clearInterval(interval);
+    }, []);
 
     /**
      * Simulates AI classification with a delay.
@@ -153,6 +163,7 @@ export default function TaskDashboard() {
                                     onMoveTask={handleMoveTask}
                                     onClassifyTask={handleClassifyTask}
                                     classifyingTask={classifyingTask}
+                                    now={now}
                                 />
                             ))}
                         </div>
@@ -187,12 +198,14 @@ function KanbanColumn({
     onMoveTask,
     onClassifyTask,
     classifyingTask,
+    now,
 }: {
     status: Task['status'];
     tasks: Task[];
     onMoveTask: (taskId: string, newStatus: Task['status']) => void;
     onClassifyTask: (taskId: string) => void;
     classifyingTask: string | null;
+    now: number | null;
 }) {
     const columnLabels = {
         todo: 'To Do',
@@ -223,6 +236,7 @@ function KanbanColumn({
                         onMoveTask={onMoveTask}
                         onClassifyTask={onClassifyTask}
                         isClassifying={classifyingTask === task.id}
+                        now={now}
                     />
                 ))}
             </div>
@@ -243,11 +257,12 @@ function TaskCard({
     onMoveTask: (taskId: string, newStatus: Task['status']) => void;
     onClassifyTask: (taskId: string) => void;
     isClassifying: boolean;
+    now: number | null;
 }) {
     const getUrgencyStyles = () => {
-        if (!task.due_date) return { bg: 'bg-white', border: 'border-gray-200', text: 'text-gray-900' };
+        if (!task.due_date || now === null) return { bg: 'bg-white', border: 'border-gray-200', text: 'text-gray-900' };
 
-        const hoursUntilDue = (new Date(task.due_date).getTime() - Date.now()) / (1000 * 60 * 60);
+        const hoursUntilDue = (new Date(task.due_date).getTime() - now) / (1000 * 60 * 60);
 
         if (hoursUntilDue < 0) return { bg: 'bg-red-50', border: 'border-red-600 border-2', text: 'text-red-900 font-bold' };
         if (hoursUntilDue < 24) return { bg: 'bg-red-100', border: 'border-red-500 border-2', text: 'text-red-900 font-semibold' };
@@ -259,8 +274,8 @@ function TaskCard({
     const urgency = getUrgencyStyles();
 
     const getTimeRemaining = () => {
-        if (!task.due_date) return null;
-        const hoursUntilDue = (new Date(task.due_date).getTime() - Date.now()) / (1000 * 60 * 60);
+        if (!task.due_date || now === null) return null;
+        const hoursUntilDue = (new Date(task.due_date).getTime() - now) / (1000 * 60 * 60);
         if (hoursUntilDue < 0) return <span role="img" aria-label="Overdue">⚠️ Overdue</span>;
         if (hoursUntilDue < 24) return <span role="img" aria-label="Hours left">🔥 {Math.floor(hoursUntilDue)}h left</span>;
         const days = Math.floor(hoursUntilDue / 24);
