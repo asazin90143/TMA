@@ -1,3 +1,8 @@
+const result = require('dotenv').config({ path: '.env.local' });
+if (result.error) {
+    console.log('Error loading .env.local:', result.error);
+}
+console.log('DEBUG: DATABASE_URL is', process.env.DATABASE_URL ? 'SET' : 'NOT SET');
 const { Pool } = require('pg');
 
 const pool = new Pool({
