@@ -79,9 +79,11 @@ export default function TaskDashboard() {
     const [now, setNow] = useState<number | null>(null);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         setNow(Date.now());
-        // Update 'now' every minute to refresh urgency indicators
-        const interval = setInterval(() => setNow(Date.now()), 60000);
+        const interval = setInterval(() => {
+            setNow(Date.now());
+        }, 60000);
         return () => clearInterval(interval);
     }, []);
 
