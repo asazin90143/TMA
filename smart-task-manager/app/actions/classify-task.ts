@@ -48,7 +48,7 @@ export async function classifyTask(
             title: input.title,
             description: input.description,
             dueDate: input.dueDate,
-            manualPriority: input.manualPriority as any,
+            manualPriority: input.manualPriority as 'low' | 'medium' | 'high' | 'critical' | null,
             createdAt: task.created_at,
         })
 

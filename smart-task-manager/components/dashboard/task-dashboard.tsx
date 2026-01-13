@@ -127,7 +127,7 @@ export default function TaskDashboard() {
                     </Button>
                 </div>
 
-                <Tabs value={activeView} onValueChange={(v) => setActiveView(v as any)} className="space-y-4">
+                <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'kanban' | 'calendar' | 'list')} className="space-y-4">
                     <TabsList>
                         <TabsTrigger value="kanban" className="gap-2">
                             <LayoutDashboard className="w-4 h-4" />
