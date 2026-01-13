@@ -254,6 +254,7 @@ function TaskCard({
     onMoveTask,
     onClassifyTask,
     isClassifying,
+    now,
 }: {
     task: Task;
     onMoveTask: (taskId: string, newStatus: Task['status']) => void;
