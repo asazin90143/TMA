@@ -1,18 +1,16 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
 import { calculatePriority } from '@/lib/utils/calculate-priority'
 import { createTaskSchema } from '@/lib/validations/task'
 
 export async function createTask(input: unknown) {
-    const supabase = createClient()
-
     // Validate input
     const validated = createTaskSchema.parse(input)
 
-    // Get current user
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Unauthorized')
+    // TODO: Implement proper authentication (e.g., NextAuth)
+    // For now, using a fixed user ID for the Render database transition
+    const userId = 'user_00000000-0000-0000-0000-000000000000';
 
     // Calculate initial priority
     const priority = calculatePriority({
@@ -23,19 +21,35 @@ export async function createTask(input: unknown) {
         createdAt: new Date().toISOString(),
     })
 
-    // Create task with calculated priority
-    const { data, error } = await supabase
-        .from('tasks')
-        .insert({
-            ...validated,
-            created_by: user.id,
-            priority_score: priority.score,
-            eisenhower_category: priority.eisenhower_category,
-        })
-        .select()
-        .single()
+    try {
+        // Create task with calculated priority using SQL
+        const result = await db.query(
+            `INSERT INTO tasks (
+                title, 
+                description, 
+                status, 
+                priority_score, 
+                due_date, 
+                eisenhower_category, 
+                created_by,
+                manual_priority
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+            RETURNING *`,
+            [
+                validated.title,
+                validated.description,
+                validated.status,
+                priority.score,
+                validated.due_date,
+                priority.eisenhower_category,
+                userId,
+                validated.manual_priority
+            ]
+        );
 
-    if (error) throw error
-
-    return { success: true, task: data }
+        return { success: true, task: result.rows[0] }
+    } catch (error) {
+        console.error('Database Error:', error);
+        throw error;
+    }
 }

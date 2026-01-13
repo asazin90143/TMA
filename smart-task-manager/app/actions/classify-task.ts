@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
 import { calculatePriority } from '@/lib/utils/calculate-priority'
 
 export interface ClassifyTaskInput {
@@ -27,16 +27,14 @@ export async function classifyTask(
     input: ClassifyTaskInput
 ): Promise<ClassifyTaskResult> {
     try {
-        const supabase = createClient()
-
         // Fetch task to get created_at timestamp
-        const { data: task, error: fetchError } = await supabase
-            .from('tasks')
-            .select('id, created_at')
-            .eq('id', input.taskId)
-            .single()
+        const fetchResult = await db.query(
+            'SELECT id, created_at FROM tasks WHERE id = $1',
+            [input.taskId]
+        );
+        const task = fetchResult.rows[0];
 
-        if (fetchError || !task) {
+        if (!task) {
             return {
                 success: false,
                 error: 'Task not found or access denied',
@@ -53,21 +51,19 @@ export async function classifyTask(
         })
 
         // Update task in database
-        const { error: updateError } = await supabase
-            .from('tasks')
-            .update({
-                eisenhower_category: classification.eisenhower_category,
-                priority_score: classification.score,
-                updated_at: new Date().toISOString(),
-            })
-            .eq('id', input.taskId)
-
-        if (updateError) {
-            return {
-                success: false,
-                error: 'Failed to update task',
-            }
-        }
+        await db.query(
+            `UPDATE tasks 
+             SET eisenhower_category = $1, 
+                 priority_score = $2, 
+                 updated_at = $3 
+             WHERE id = $4`,
+            [
+                classification.eisenhower_category,
+                classification.score,
+                new Date().toISOString(),
+                input.taskId
+            ]
+        );
 
         return {
             success: true,
