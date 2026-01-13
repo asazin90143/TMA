@@ -5,6 +5,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, LayoutDashboard, List, Plus, Sparkles } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { createTask } from '@/app/actions/create-task';
 
 // Mock task data for demonstration
 interface Task {
@@ -73,6 +78,9 @@ const MOCK_TASKS: Task[] = [
 
 export default function TaskDashboard() {
     const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
+    // ... existing state
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
     const [activeView, setActiveView] = useState<'kanban' | 'calendar' | 'list'>('kanban');
     const [draggedTask, setDraggedTask] = useState<string | null>(null);
     const [classifyingTask, setClassifyingTask] = useState<string | null>(null);
@@ -125,6 +133,48 @@ export default function TaskDashboard() {
 
     const columns: Task['status'][] = ['todo', 'in_progress', 'review', 'done'];
 
+    const handleCreateTask = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsCreating(true);
+        const formData = new FormData(e.currentTarget);
+
+        try {
+            const result = await createTask({
+                title: formData.get('title'),
+                description: formData.get('description'),
+                due_date: formData.get('due_date') ? new Date(formData.get('due_date') as string).toISOString() : undefined,
+                manual_priority: formData.get('priority') || undefined,
+            });
+
+            if (result.success && result.task) {
+                // Add to local state for immediate feedback using the returned task
+                // We need to map the DB task shape to our frontend Task shape if they differ
+                // For now, let's just re-fetch or append. 
+                // Since strict typing is on, let's cast or map.
+                const newTask: Task = {
+                    id: result.task.id,
+                    title: result.task.title,
+                    description: result.task.description,
+                    status: result.task.status as any,
+                    due_date: result.task.due_date,
+                    priority_score: result.task.priority_score,
+                    eisenhower_category: result.task.eisenhower_category,
+                    position: 0
+                };
+
+                setTasks(prev => [newTask, ...prev]);
+                setIsCreateOpen(false);
+            }
+        } catch (error) {
+            console.error('Failed to create task:', error);
+            alert('Failed to create task');
+        } finally {
+            setIsCreating(false);
+        }
+    };
+
+    // ... existing logic
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-8">
             <div className="max-w-7xl mx-auto space-y-6">
@@ -133,10 +183,59 @@ export default function TaskDashboard() {
                         <h1 className="text-3xl font-bold text-gray-900">Smart Task Manager</h1>
                         <p className="text-gray-600 mt-1">AI-powered prioritization for freelance developers</p>
                     </div>
-                    <Button className="gap-2">
-                        <Plus className="w-4 h-4" />
-                        New Task
-                    </Button>
+
+                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="gap-2">
+                                <Plus className="w-4 h-4" />
+                                New Task
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Create New Task</DialogTitle>
+                                <DialogDescription>
+                                    Add a task and let AI help you prioritize it.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <form onSubmit={handleCreateTask} className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="title">Task Title</Label>
+                                    <Input id="title" name="title" required placeholder="e.g., Fix payment integration" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="description">Description (Optional)</Label>
+                                    <Textarea id="description" name="description" placeholder="Details about the task..." />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="due_date">Due Date</Label>
+                                        <Input id="due_date" name="due_date" type="datetime-local" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="priority">Manual Priority</Label>
+                                        <select
+                                            id="priority"
+                                            name="priority"
+                                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            <option value="">Auto (AI)</option>
+                                            <option value="low">Low</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="high">High</option>
+                                            <option value="critical">Critical</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
+                                    <Button type="submit" disabled={isCreating}>
+                                        {isCreating ? 'Creating...' : 'Create Task'}
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
                 </div>
 
                 <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'kanban' | 'calendar' | 'list')} className="space-y-4">
