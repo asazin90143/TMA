@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -261,10 +261,10 @@ function TaskCard({
     const getTimeRemaining = () => {
         if (!task.due_date) return null;
         const hoursUntilDue = (new Date(task.due_date).getTime() - Date.now()) / (1000 * 60 * 60);
-        if (hoursUntilDue < 0) return '⚠️ Overdue';
-        if (hoursUntilDue < 24) return `🔥 ${Math.floor(hoursUntilDue)}h left`;
+        if (hoursUntilDue < 0) return <span role="img" aria-label="Overdue">⚠️ Overdue</span>;
+        if (hoursUntilDue < 24) return <span role="img" aria-label="Hours left">🔥 {Math.floor(hoursUntilDue)}h left</span>;
         const days = Math.floor(hoursUntilDue / 24);
-        return `📅 ${days}d left`;
+        return <span role="img" aria-label="Days left">📅 {days}d left</span>;
     };
 
     return (
@@ -495,12 +495,12 @@ function ListView({
     );
 }
 
-function formatCategory(category: string): string {
-    const map: Record<string, string> = {
-        do_first: '🔥 Do First',
-        schedule: '📅 Schedule',
-        delegate: '👥 Delegate',
-        delete: '🗑️ Delete',
+function formatCategory(category: string): ReactNode {
+    const map: Record<string, ReactNode> = {
+        do_first: <><span role="img" aria-label="Fire">🔥</span> Do First</>,
+        schedule: <><span role="img" aria-label="Calendar">📅</span> Schedule</>,
+        delegate: <><span role="img" aria-label="People">👥</span> Delegate</>,
+        delete: <><span role="img" aria-label="Trash">🗑️</span> Delete</>,
     };
     return map[category] || category;
 }

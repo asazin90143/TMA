@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module '@supabase/ssr' {
     export function createBrowserClient(url?: string, key?: string, opts?: any): any
     export function createServerClient(url?: string, key?: string, opts?: any): any
