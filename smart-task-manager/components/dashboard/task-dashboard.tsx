@@ -176,18 +176,18 @@ export default function TaskDashboard() {
     // ... existing logic
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-8">
-            <div className="max-w-7xl mx-auto space-y-6">
-                <div className="flex items-center justify-between">
+        <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-50 via-slate-50 to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-6 md:p-8 font-sans">
+            <div className="max-w-[1400px] mx-auto space-y-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Smart Task Manager</h1>
-                        <p className="text-gray-600 mt-1">AI-powered prioritization for freelance developers</p>
+                        <h1 className="text-4xl font-extrabold tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">Smart Task Manager</h1>
+                        <p className="text-muted-foreground mt-2 text-lg">AI-powered prioritization to reclaim your time.</p>
                     </div>
 
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
-                            <Button className="gap-2">
-                                <Plus className="w-4 h-4" />
+                            <Button className="gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 bg-primary text-primary-foreground text-md px-6 py-6 h-auto rounded-xl">
+                                <Plus className="w-5 h-5" />
                                 New Task
                             </Button>
                         </DialogTrigger>
@@ -238,24 +238,24 @@ export default function TaskDashboard() {
                     </Dialog>
                 </div>
 
-                <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'kanban' | 'calendar' | 'list')} className="space-y-4">
-                    <TabsList>
-                        <TabsTrigger value="kanban" className="gap-2">
+                <Tabs value={activeView} onValueChange={(v) => setActiveView(v as 'kanban' | 'calendar' | 'list')} className="space-y-6">
+                    <TabsList className="bg-white/50 backdrop-blur-md border border-slate-200/50 p-1 rounded-xl">
+                        <TabsTrigger value="kanban" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 rounded-lg transition-all">
                             <LayoutDashboard className="w-4 h-4" />
                             Kanban
                         </TabsTrigger>
-                        <TabsTrigger value="calendar" className="gap-2">
+                        <TabsTrigger value="calendar" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 rounded-lg transition-all">
                             <Calendar className="w-4 h-4" />
                             Calendar
                         </TabsTrigger>
-                        <TabsTrigger value="list" className="gap-2">
+                        <TabsTrigger value="list" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 rounded-lg transition-all">
                             <List className="w-4 h-4" />
                             List
                         </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="kanban" className="mt-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {columns.map((status) => (
                                 <KanbanColumn
                                     key={status}
@@ -279,11 +279,15 @@ export default function TaskDashboard() {
                     </TabsContent>
                 </Tabs>
 
-                <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-900">
-                        <strong>Demo Mode:</strong> This is a fully functional UI demonstration. In production, tasks sync in real-time
-                        via Supabase and AI classification uses Claude API. Click the sparkle icon on any task to simulate AI analysis.
-                    </p>
+                <div className="mt-8 p-6 bg-indigo-50/50 backdrop-blur-sm border border-indigo-100 rounded-2xl flex items-start gap-3 shadow-sm">
+                    <div className="p-2 bg-indigo-100 rounded-full text-indigo-600">
+                        <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div className="text-sm text-indigo-900/80 leading-relaxed">
+                        <strong>Demo Mode Active.</strong> Experiencing the power of AI-driven task management.
+                        <br />
+                        In production, tasks sync in real-time. Use the sparkle icon on any task to simulate our advanced AI classification engine.
+                    </div>
                 </div>
             </div>
         </div>
@@ -315,21 +319,21 @@ function KanbanColumn({
         done: 'Done',
     };
 
-    const columnColors = {
-        todo: 'bg-gray-100',
-        in_progress: 'bg-blue-100',
-        review: 'bg-yellow-100',
-        done: 'bg-green-100',
+    const columnAccents = {
+        todo: 'border-t-4 border-t-slate-400 bg-slate-50/50',
+        in_progress: 'border-t-4 border-t-blue-500 bg-blue-50/30',
+        review: 'border-t-4 border-t-purple-500 bg-purple-50/30',
+        done: 'border-t-4 border-t-emerald-500 bg-emerald-50/30',
     };
 
     return (
-        <div className={`${columnColors[status]} rounded-lg p-4 min-h-[600px]`}>
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">{columnLabels[status]}</h3>
-                <Badge variant="secondary">{tasks.length}</Badge>
+        <div className={`rounded-xl p-4 min-h-[600px] border border-slate-100/60 backdrop-blur-sm ${columnAccents[status]}`}>
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="font-bold text-slate-700 tracking-tight text-lg">{columnLabels[status]}</h3>
+                <Badge variant="secondary" className="bg-white/80 shadow-sm text-slate-600 font-mono">{tasks.length}</Badge>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
                 {tasks.map((task) => (
                     <TaskCard
                         key={task.id}
@@ -362,15 +366,14 @@ function TaskCard({
     now: number | null;
 }) {
     const getUrgencyStyles = () => {
-        if (!task.due_date || now === null) return { bg: 'bg-white', border: 'border-gray-200', text: 'text-gray-900' };
+        if (!task.due_date || now === null) return { border: 'border-l-transparent', badge: 'bg-slate-100 text-slate-600' };
 
         const hoursUntilDue = (new Date(task.due_date).getTime() - now) / (1000 * 60 * 60);
 
-        if (hoursUntilDue < 0) return { bg: 'bg-red-50', border: 'border-red-600 border-2', text: 'text-red-900 font-bold' };
-        if (hoursUntilDue < 24) return { bg: 'bg-red-100', border: 'border-red-500 border-2', text: 'text-red-900 font-semibold' };
-        if (hoursUntilDue < 72) return { bg: 'bg-orange-50', border: 'border-orange-500 border-2', text: 'text-orange-900 font-semibold' };
-        if (hoursUntilDue < 168) return { bg: 'bg-yellow-50', border: 'border-yellow-400', text: 'text-yellow-900' };
-        return { bg: 'bg-white', border: 'border-green-500', text: 'text-gray-900' };
+        if (hoursUntilDue < 0) return { border: 'border-l-red-500', badge: 'bg-red-100 text-red-700' };
+        if (hoursUntilDue < 24) return { border: 'border-l-orange-500', badge: 'bg-orange-100 text-orange-700' };
+        if (hoursUntilDue < 72) return { border: 'border-l-amber-400', badge: 'bg-amber-100 text-amber-700' };
+        return { border: 'border-l-emerald-400', badge: 'bg-emerald-100 text-emerald-700' };
     };
 
     const urgency = getUrgencyStyles();
@@ -378,78 +381,86 @@ function TaskCard({
     const getTimeRemaining = () => {
         if (!task.due_date || now === null) return null;
         const hoursUntilDue = (new Date(task.due_date).getTime() - now) / (1000 * 60 * 60);
-        if (hoursUntilDue < 0) return <span role="img" aria-label="Overdue">⚠️ Overdue</span>;
-        if (hoursUntilDue < 24) return <span role="img" aria-label="Hours left">🔥 {Math.floor(hoursUntilDue)}h left</span>;
+        if (hoursUntilDue < 0) return <span className="flex items-center gap-1">⚠️ Overdue</span>;
+        if (hoursUntilDue < 24) return <span className="flex items-center gap-1">🔥 {Math.ceil(hoursUntilDue)}h</span>;
         const days = Math.floor(hoursUntilDue / 24);
-        return <span role="img" aria-label="Days left">📅 {days}d left</span>;
+        return <span className="flex items-center gap-1">📅 {days}d</span>;
     };
 
     return (
         <div
             className={`
-        ${urgency.bg} ${urgency.border}
-        border rounded-lg p-4 transition-all hover:shadow-lg
-        cursor-grab active:cursor-grabbing group
+        bg-white rounded-xl p-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-1
+        cursor-grab active:cursor-grabbing group border border-slate-100 shadow-sm
+        border-l-4 ${urgency.border}
       `}
         >
-            <div className="flex items-start justify-between gap-2 mb-2">
-                <h4 className={`font-medium text-sm flex-1 ${urgency.text}`}>{task.title}</h4>
+            <div className="flex items-start justify-between gap-3 mb-3">
+                <h4 className="font-semibold text-slate-900 text-base leading-tight flex-1">{task.title}</h4>
                 <button
                     onClick={() => onClassifyTask(task.id)}
                     disabled={isClassifying}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="opacity-0 group-hover:opacity-100 transition-all p-1.5 hover:bg-indigo-50 rounded-full text-indigo-400 hover:text-indigo-600"
+                    title="AI Priority Analysis"
                 >
-                    <Sparkles className={`w-4 h-4 ${isClassifying ? 'text-blue-600 animate-spin' : 'text-gray-400 hover:text-blue-600'}`} />
+                    <Sparkles className={`w-4 h-4 ${isClassifying ? 'text-indigo-600 animate-spin' : ''}`} />
                 </button>
             </div>
 
             {task.description && (
-                <p className="text-xs text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                <p className="text-sm text-slate-500 mb-4 line-clamp-2 leading-relaxed">{task.description}</p>
             )}
 
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
                 {task.due_date && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className={`text-xs font-normal border-0 ${urgency.badge}`}>
                         {getTimeRemaining()}
                     </Badge>
                 )}
                 {task.eisenhower_category && (
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-0">
                         {formatCategory(task.eisenhower_category)}
                     </Badge>
                 )}
             </div>
 
             {task.priority_score !== null && (
-                <div className="flex items-center gap-2 mb-3">
-                    <div className="h-1.5 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                <div className="mb-4">
+                    <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
+                        <span>Priority Score</span>
+                        <span className="font-mono text-slate-600">{task.priority_score}</span>
+                    </div>
+                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                         <div
-                            className={`h-full transition-all ${getPriorityColor(task.priority_score)}`}
+                            className={`h-full transition-all duration-1000 ease-out rounded-full bg-gradient-to-r ${getPriorityGradient(task.priority_score)}`}
                             style={{ width: `${task.priority_score}%` }}
                         />
                     </div>
-                    <span className="text-xs font-medium w-8 text-right">{task.priority_score}</span>
                 </div>
             )}
 
-            <div className="flex gap-1 flex-wrap">
-                {(['todo', 'in_progress', 'review', 'done'] as const).map((newStatus) => (
-                    newStatus !== task.status && (
-                        <button
-                            key={newStatus}
-                            onClick={() => onMoveTask(task.id, newStatus)}
-                            className="text-xs px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-                        >
-                            → {newStatus.replace('_', ' ')}
-                        </button>
-                    )
-                ))}
+            <div className="flex items-center justify-between pt-3 border-t border-slate-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Move to:</span>
+                <div className="flex gap-1">
+                    {(['todo', 'in_progress', 'review', 'done'] as const).map((newStatus) => (
+                        newStatus !== task.status && (
+                            <button
+                                key={newStatus}
+                                onClick={(e) => { e.stopPropagation(); onMoveTask(task.id, newStatus); }}
+                                className="text-[10px] font-medium px-2 py-1 bg-slate-50 text-slate-600 rounded-md hover:bg-indigo-50 hover:text-indigo-700 transition-colors border border-slate-200 hover:border-indigo-200"
+                                title={`Move to ${newStatus.replace('_', ' ')}`}
+                            >
+                                {newStatus === 'in_progress' ? 'In Prog' : newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}
+                            </button>
+                        )
+                    ))}
+                </div>
             </div>
 
             {isClassifying && (
-                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-900 flex items-center gap-2">
+                <div className="mt-2 p-2 bg-indigo-50/50 border border-indigo-100 rounded-lg text-xs text-indigo-800 flex items-center gap-2 animate-pulse">
                     <Sparkles className="w-3 h-3 animate-spin" />
-                    AI analyzing task...
+                    AI analyzing context...
                 </div>
             )}
         </div>
@@ -480,30 +491,34 @@ function CalendarView({
     }, {} as Record<string, Task[]>);
 
     return (
-        <div className="bg-white rounded-lg border shadow-sm p-6">
-            <h3 className="text-lg font-semibold mb-4">Tasks by Due Date</h3>
-            <div className="space-y-6">
+        <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm p-6">
+            <h3 className="text-lg font-bold text-slate-800 mb-6 tracking-tight">Tasks by Due Date</h3>
+            <div className="space-y-8">
                 {Object.keys(groupedByDate).length === 0 ? (
-                    <p className="text-gray-500">No tasks with due dates</p>
+                    <p className="text-slate-500 italic text-center py-8">No tasks with due dates</p>
                 ) : (
                     Object.entries(groupedByDate).map(([date, dateTasks]) => (
-                        <div key={date} className="space-y-2">
-                            <h4 className="font-medium text-sm text-gray-700 border-b pb-2">{date}</h4>
-                            <div className="space-y-2">
+                        <div key={date} className="space-y-3">
+                            <h4 className="font-semibold text-sm text-indigo-900 border-b border-indigo-100 pb-2 flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-indigo-500" />
+                                {date}
+                            </h4>
+                            <div className="space-y-3">
                                 {dateTasks.map((task) => (
-                                    <div key={task.id} className="border rounded-lg p-3 hover:shadow-md transition-shadow">
-                                        <div className="flex items-center justify-between">
+                                    <div key={task.id} className="bg-white border border-slate-100 rounded-lg p-4 hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer group">
+                                        <div className="flex items-center justify-between gap-4">
                                             <div className="flex-1">
-                                                <h5 className="font-medium text-sm">{task.title}</h5>
-                                                <p className="text-xs text-gray-600 mt-1">{task.description}</p>
+                                                <h5 className="font-semibold text-sm text-slate-800 group-hover:text-indigo-700 transition-colors">{task.title}</h5>
+                                                {task.description && <p className="text-xs text-slate-500 mt-1 line-clamp-1">{task.description}</p>}
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <Badge variant="secondary">{task.status.replace('_', ' ')}</Badge>
+                                            <div className="flex items-center gap-3">
+                                                <Badge variant="secondary" className="bg-slate-50 text-slate-600 border-0">{task.status.replace('_', ' ')}</Badge>
                                                 <button
-                                                    onClick={() => onClassifyTask(task.id)}
+                                                    onClick={(e) => { e.stopPropagation(); onClassifyTask(task.id); }}
                                                     disabled={classifyingTask === task.id}
+                                                    className="p-1.5 hover:bg-indigo-50 rounded-full text-indigo-400 hover:text-indigo-600 transition-colors opacity-0 group-hover:opacity-100"
                                                 >
-                                                    <Sparkles className={`w-4 h-4 ${classifyingTask === task.id ? 'text-blue-600 animate-spin' : 'text-gray-400 hover:text-blue-600'}`} />
+                                                    <Sparkles className={`w-4 h-4 ${classifyingTask === task.id ? 'text-indigo-600 animate-spin' : ''}`} />
                                                 </button>
                                             </div>
                                         </div>
@@ -584,9 +599,9 @@ function ListView({
                             </td>
                             <td className="px-4 py-3">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div
-                                            className={`h-full ${getPriorityColor(task.priority_score)}`}
+                                            className={`h-full rounded-full bg-gradient-to-r ${getPriorityGradient(task.priority_score)}`}
                                             style={{ width: `${task.priority_score}%` }}
                                         />
                                     </div>
@@ -622,9 +637,9 @@ function formatCategory(category: string): ReactNode {
     return map[category] || category;
 }
 
-function getPriorityColor(score: number): string {
-    if (score >= 80) return 'bg-red-500';
-    if (score >= 60) return 'bg-orange-500';
-    if (score >= 40) return 'bg-yellow-500';
-    return 'bg-green-500';
+function getPriorityGradient(score: number): string {
+    if (score >= 80) return 'from-red-600 to-rose-500';
+    if (score >= 60) return 'from-orange-500 to-amber-500';
+    if (score >= 40) return 'from-amber-400 to-yellow-400';
+    return 'from-emerald-500 to-teal-400';
 }
