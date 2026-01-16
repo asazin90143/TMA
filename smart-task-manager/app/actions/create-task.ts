@@ -48,8 +48,8 @@ export async function createTask(input: unknown) {
         );
 
         return { success: true, task: result.rows[0] }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Database Error:', error);
-        throw error;
+        return { success: false, error: error.message || 'Database error' };
     }
 }

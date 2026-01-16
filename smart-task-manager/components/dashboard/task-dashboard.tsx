@@ -164,10 +164,13 @@ export default function TaskDashboard() {
 
                 setTasks(prev => [newTask, ...prev]);
                 setIsCreateOpen(false);
+            } else {
+                console.error('Task creation failed:', result.error);
+                alert(`Failed to create task: ${result.error || 'Unknown server error'}`);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to create task:', error);
-            alert('Failed to create task');
+            alert(`Failed to create task: ${error.message || 'Connection error'}`);
         } finally {
             setIsCreating(false);
         }
