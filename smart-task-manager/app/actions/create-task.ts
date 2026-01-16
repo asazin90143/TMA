@@ -50,6 +50,6 @@ export async function createTask(input: unknown) {
         return { success: true, task: result.rows[0] }
     } catch (error: any) {
         console.error('Database Error:', error);
-        return { success: false, error: error.message || 'Database error' };
+        return { success: false, error: `${error.message} - Code: ${(error as any).code} - Detail: ${(error as any).detail}` };
     }
 }
